@@ -1,0 +1,44 @@
+
+##Retrieve and load the MNIST dataset
+from sklearn.datasets import fetch_openml
+mnist = fetch_openml('mnist_784', version=1)
+X, y = mnist["data"], mnist["target"]
+##Display each digit:
+import matplotlib.pyplot as plt
+import numpy as np
+
+some_digit = X.to_numpy()[0]
+some_digit_image = some_digit.reshape(28, 28)
+
+plt.imshow(some_digit_image, cmap="binary")
+plt.axis("off")
+plt.show()
+##Use PCA to retrieve the 1st and 2nd principal components
+from sklearn.decomposition import PCA
+
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X)
+print("Explained variance ratio:", pca.explained_variance_ratio_)
+##Plot the projections of the 1st and 2nd principal components
+plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y.astype(int), cmap="viridis", edgecolor="k", s=20)
+plt.xlabel("First principal component")
+plt.ylabel("Second principal component")
+plt.show()
+##Use Incremental PCA to reduce the dimensionality to 154 dimensions:
+from sklearn.decomposition import IncrementalPCA
+
+inc_pca = IncrementalPCA(n_components=154)
+X_reduced = inc_pca.fit_transform(X)
+
+##Display the original and compressed digits:
+# Original digit
+original_digit = X.to_numpy()[0].reshape(28, 28)
+plt.imshow(original_digit, cmap="binary")
+plt.axis("off")
+plt.show()
+
+# Compressed digit
+compressed_digit = inc_pca.inverse_transform(X_reduced[0]).reshape(28, 28)
+plt.imshow(compressed_digit, cmap="binary")
+plt.axis("off")
+plt.show()
